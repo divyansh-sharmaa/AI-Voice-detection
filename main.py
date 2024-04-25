@@ -15,14 +15,6 @@ recognizer = sr.Recognizer()
 import mysql.connector
 from mysql.connector import Error
 
-connection = mysql.connector.connect(
-    host='localhost',
-    database='ai_voice',
-    user='root',
-    password='#MySQL123456789#'
-)
-
-cursor = connection.cursor()
 
 # Constants
 SAMPLE_RATE = 44100  # Sample rate of your audio files
@@ -31,8 +23,7 @@ N_MELS = 128  # Number of Mel bands for Mel spectrogram
 NUM_CLASSES = 2  # Number of classes for classification
 
 # Load model
-model = load_model("audio_classifier.h5")
-toggle_value = True
+model = load_model("YOUR-MODEL")
 
 # Function to preprocess audio
 def preprocess_audio(audio):
@@ -50,10 +41,7 @@ def preprocess_audio(audio):
 
 # Streamlit app
 st.title("AI Voice Detection")
-#st.title('Audio Classification')
-
-if st.checkbox('Audio Classification'):
-    toggle_value = not toggle_value
+st.title('Audio Classification')
 
 def record_audio(duration):
     with st.spinner("Recording..."):
@@ -70,10 +58,6 @@ if st.button("Record"):
     st.session_state.file_name = "recorded_audio.flac"
     st.session_state.recorded_audio = recorded_audio
     st.session_state.set_stat = "rec"
-    if toggle_value:
-        st.session_state.class_name = ['Real', 'Real']
-    else:
-        st.session_state.class_name = ['Fake', 'Fake']
     
 # "Transcript" button
 if st.button("Transcript"):
@@ -110,7 +94,6 @@ if uploaded_file is not None:
     st.session_state.recorded_audio = upload_data
     st.audio(uploaded_file, format='audio')
     st.session_state.set_stat = "upl"
-    st.session_state.class_name = ['Fake', 'Real']
     st.session_state.transcribe = ""
 
 if st.button("Predict"):
@@ -120,7 +103,7 @@ if st.button("Predict"):
     prediction = model.predict(mel_spectrogram)
     st.warning(st.session_state.transcribe)
     st.success(prediction)
-    class_names = st.session_state.class_name
+    class_names = ['Fake', 'Real']
     st.write('Prediction:')
     prediction_label = class_names[np.argmax(prediction)]
     st.write(prediction_label)
